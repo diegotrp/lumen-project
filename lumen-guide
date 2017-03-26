@@ -1,0 +1,69 @@
+- Create new project
+composer create-project --prefer-dist laravel/lumen lumen-project
+
+- Edit .env file
+"CACHE_DRIVER=array"
+
+- Create database
+$ mysql -u root -p
+$ root
+-> CREATE DATABASE test;
+-> USE DATABASE test;
+
+- Edit .env file
+"DB_DATABASE=(Nombre de base de datos)"
+"DB_USER=..."
+"DB_PASSWORD=..."
+
+- Edit app.php in "lumen_project/bootstrap/app.php", uncomment:
+- $app->withFacades();
+$app->withEloquent();
+
+- Create migrations. In project folder:
+$ php artisan migrate:install
+
+- Create migration
+$ php artisan make:migration create_tests_table --create=tests
+
+- Edit migration file
+Schema::create('tests', function (Blueprint $table) {
+   $table->increments('id');
+   $table->string('name');
+   $table->integer('number');
+   $table->timestamps();
+}
+
+- Run migration
+$ php artisan migrate
+
+- Fill table "tests"
+-> INSERT INTO tests(id, name, number)
+-> VALUES (1, 'primero', 30);
+
+- Create model "app/test.php"
+<?php namespace App;
+- use Illuminate\Database\Eloquent\Model;
+- class Test extends Model {
+-     protected $fillable = ['name', 'number'];
+- }
+
+- Create controller TestController (manually)
+<?php
+   namespace App\Http\Controllers;
+   use App\Test;
+   class TestController extends Controller {
+      public function show($id) {
+         return Test::findOrFail($id);
+      }
+      public function index() {
+         return Test::all;
+      }
+
+- }
+- Define routes in web.php (manually)
+$app->get(...);
+$app->get('/tests", 'TestController@index');
+$app->get('/test/{id}", 'TestController@show');
+
+- Run server
+$ php -S localhost:8080 -t public
